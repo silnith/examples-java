@@ -22,7 +22,6 @@ jobs:
           - liberica
           - microsoft
           - corretto
-          - semuru
           - oracle
           - dragonwell
         version:
