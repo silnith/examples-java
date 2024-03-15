@@ -1,4 +1,4 @@
-package org.silnith.example.spring.boot.mvc;
+package org.silnith.example.spring.boot;
 
 import static org.junit.jupiter.api.Assertions.*;
 
