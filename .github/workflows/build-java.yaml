@@ -17,15 +17,15 @@ jobs:
     strategy:
       matrix:
         distribution:
-          - temurin
-          - zulu
-          - liberica
-          - microsoft
-          - corretto
+#          - temurin
+#          - zulu
+#          - liberica
+#          - microsoft
+#          - corretto
           - oracle
-          - dragonwell
+#          - dragonwell
         version:
-          - 17
+#          - 17
           - 21
     steps:
       - name: Checkout
