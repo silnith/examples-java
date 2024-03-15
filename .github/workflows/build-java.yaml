@@ -53,11 +53,10 @@ jobs:
         working-directory: example-java
         run: mvn site
       - name: Upload Artifacts
-        working-directory: example-java
         uses: actions/upload-artifact@v3
         with:
           name: target
-          path: target/
+          path: example-java/target/
       - name: Publish Package
         working-directory: example-java
         run: mvn deploy
