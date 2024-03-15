@@ -1,0 +1,63 @@
+name: Java Build
+
+on:
+  workflow_call:
+
+env: {}
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    strategy:
+      matrix:
+        distribution:
+          - temurin
+          - zulu
+          - liberica
+          - microsoft
+          - corretto
+          - semuru
+          - oracle
+          - dragonwell
+        version:
+          - 17
+          - 21
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up ${{ matrix.distribution }} JDK ${{ matrix.version }}
+        uses: actions/setup-java@v3
+        with:
+          java-version: 8 11 ${{ matrix.version }}
+          distribution: ${{ matrix.distribution }}
+          java-package: jdk
+          cache: maven
+      - name: Resolve Dependencies
+        continue-on-error: true
+        working-directory: example-java
+        run: mvn dependency:go-offline
+      - name: Maven Clean
+        working-directory: example-java
+        run: mvn clean
+      - name: Maven Verify
+        working-directory: example-java
+        run: mvn verify
+      - name: Maven Site
+        continue-on-error: true
+        working-directory: example-java
+        run: mvn site
+      - name: Upload Artifacts
+        working-directory: example-java
+        uses: actions/upload-artifact@v3
+        with:
+          name: target
+          path: target/
+      - name: Publish Package
+        working-directory: example-java
+        run: mvn deploy
