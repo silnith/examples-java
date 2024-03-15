@@ -34,7 +34,7 @@ jobs:
       - name: Set up ${{ matrix.distribution }} JDK ${{ matrix.version }}
         uses: actions/setup-java@v3
         with:
-          java-version: 8 11 ${{ matrix.version }}
+          java-version: ${{ matrix.version }}
           distribution: ${{ matrix.distribution }}
           java-package: jdk
           cache: maven
