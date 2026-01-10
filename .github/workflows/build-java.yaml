@@ -11,13 +11,13 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-#      packages: write
+      packages: write
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     strategy:
       matrix:
         distribution:
-#          - temurin
+          - temurin
 #          - zulu
 #          - liberica
 #          - microsoft
@@ -25,22 +25,105 @@ jobs:
           - oracle
 #          - dragonwell
         version:
-#          - 17
+          - 17
           - 21
+          - 25
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-      - name: Set up ${{ matrix.distribution }} JDK ${{ matrix.version }}
-        uses: actions/setup-java@v3
+        uses: actions/checkout@v6
+      - id: setup-java
+        name: Set up ${{ matrix.distribution }} JDK ${{ matrix.version }}
+        uses: actions/setup-java@v5
         with:
           java-version: ${{ matrix.version }}
           distribution: ${{ matrix.distribution }}
           java-package: jdk
-          cache: maven
+      # The setup-java action builds a settings file, but we want a better one
+      # that includes GitHub repositories across all projects for the owner.
+      - id: create-settings-file
+        name: Create Maven Settings
+        uses: s4u/maven-settings/action@v4.0.0
+        with:
+          githubServer: true
+          servers: |
+            [
+              {
+                "id": "github-silnith-org",
+                "username": "${{ github.actor }}",
+                "password": "${{ github.token }}"
+              },
+              {
+                "id": "github-${{ github.repository_owner }}",
+                "username": "${{ github.actor }}",
+                "password": "${{ github.token }}"
+              }
+            ]
+          repositories: |
+            [
+              {
+                "id": "github-silnith-org",
+                "name": "GitHub Silnith.org",
+                "url": "https://maven.pkg.github.com/silnith-org/packages"
+              },
+              {
+                "id": "github-${{ github.repository_owner }}",
+                "name": "GitHub ${{ github.repository_owner }}",
+                "url": "https://maven.pkg.github.com/${{ github.repository_owner }}/packages"
+              }
+            ]
+          pluginRepositories: |
+            [
+              {
+                "id": "github-silnith-org",
+                "name": "GitHub Silnith.org",
+                "url": "https://maven.pkg.github.com/silnith-org/packages"
+              },
+              {
+                "id": "github-${{ github.repository_owner }}",
+                "name": "GitHub ${{ github.repository_owner }}",
+                "url": "https://maven.pkg.github.com/${{ github.repository_owner }}/packages"
+              }
+            ]
+      # The setup-java action populates the toolchains file, but it only uses the
+      # new "marketing" version numbers.
+      - name: Configure Maven Toolchains
+        uses: cactuslab/maven-toolchains-xml-action@v2
+        with:
+          toolchains: |
+            [
+              {"jdkVersion": "${{ matrix.version }}", "jdkHome": "${{ steps.setup-java.outputs.path }}"},
+              {"jdkVersion": "1.${{ matrix.version }}", "jdkHome": "${{ steps.setup-java.outputs.path }}"}
+            ]
+      # Store the entire local Maven repository as a GitHub cache.
+      # This is stupid, but GitHub does not offer a non-stupid alternative.
+      - name: Cache Maven Dependencies
+        uses: actions/cache@v5
+        with:
+          key: 'maven-${{ github.repository_owner }}-${{ hashFiles(''**/pom.xml'') }}'
+          restore-keys: |
+            maven-${{ github.repository_owner }}-
+            maven-
+          fail-on-cache-miss: false
+          path: |
+            ~/.m2/repository
+      - name: Cache OWASP Data
+        uses: actions/cache@v5
+        continue-on-error: true
+        with:
+          key: 'owasp-${{ github.repository_owner }}-date'
+          restore-keys: |
+            owasp-${{ github.repository_owner }}-
+            owasp-
+          path: |
+            ~/.m2/repository/org/owasp/dependency-check-data/
       - name: Resolve Dependencies
         continue-on-error: true
         working-directory: example-java
-        run: mvn dependency:go-offline
+        run: mvn dependency:go-offline --no-transfer-progress
+      - name: Resolve PGP Keys
+        continue-on-error: true
+        working-directory: example-java
+        run: mvn pgpverify:go-offline -Dpgpverify.quiet=true
       - name: Maven Clean
         working-directory: example-java
         run: mvn clean
@@ -52,10 +135,10 @@ jobs:
         working-directory: example-java
         run: mvn site
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: target
           path: example-java/target/
-#      - name: Publish Package
-#        working-directory: example-java
-#        run: mvn deploy
+      - name: Publish Package
+        working-directory: example-java
+        run: mvn deploy
