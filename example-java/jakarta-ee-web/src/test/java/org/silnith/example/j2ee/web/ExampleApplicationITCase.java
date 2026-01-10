@@ -39,13 +39,24 @@ class ExampleApplicationITCase {
 
 	@BeforeEach
 	void setUp() throws Exception {
-		//webappTarget = client.target("http://localhost:8080/jakarta-ee-web-0.0.1-SNAPSHOT");
 		webappTarget = client.target("http://localhost:8080/jakarta-ee-web");
 	}
 
 	@AfterEach
 	void tearDown() throws Exception {
 		webappTarget = null;
+	}
+
+	@Test
+	void testGetRoot() {
+		try (final Response response = webappTarget
+				.path("example")
+				.request(MediaType.TEXT_PLAIN_TYPE)
+				.get()) {
+			assertEquals(Response.Status.OK, response.getStatusInfo().toEnum());
+			final String body = response.readEntity(String.class);
+			assertEquals("something", body);
+		}
 	}
 
 	@Test
