@@ -17,7 +17,7 @@ public class Polygon {
 	}
 
 	@JsonbCreator
-	public Polygon(@JsonbProperty("vertices") @NotNull @Size(min = 3) final List<Vertex> vertices) {
+	public Polygon(@JsonbProperty("vertices") @NotNull @Size(min = 3) final List<@NotNull @Valid Vertex> vertices) {
 		super();
 		if (vertices == null) {
 			throw new IllegalArgumentException("Vertices cannot be null.");
