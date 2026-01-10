@@ -116,10 +116,7 @@ jobs:
     needs:
       - initialize-cache
     permissions:
-      artifact-metadata: read
-      checks: read
       contents: read
-      deployments: none
 #      packages: write
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
