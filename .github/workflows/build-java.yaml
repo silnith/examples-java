@@ -42,7 +42,7 @@ jobs:
       # that includes GitHub repositories across all projects for the owner.
       - id: create-settings-file
         name: Create Maven Settings
-        uses: s4u/maven-settings/action@v4.0.0
+        uses: s4u/maven-settings-action@v4.0.0
         with:
           githubServer: true
           servers: |
