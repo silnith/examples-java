@@ -1,10 +1,11 @@
-package org.silnith.example.j2ee.web.model;
-
-import java.beans.ConstructorProperties;
+package org.silnith.example.spring.boot.model;
 
 public class Vertex {
 
-    private double x, y, z, w;
+    private double x;
+    private double y;
+    private double z;
+    private double w;
 
     public Vertex() {
         this(0, 0, 0);
@@ -14,7 +15,7 @@ public class Vertex {
         this(x, y, z, 1);
     }
 
-    @ConstructorProperties({ "x", "y", "z", "w" })
+    
     public Vertex(double x, double y, double z, double w) {
         super();
         this.x = x;

@@ -6,9 +6,12 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.json.Json;
 import jakarta.json.stream.JsonGenerator;
 import jakarta.json.stream.JsonParser;
+import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -21,22 +24,23 @@ import jakarta.ws.rs.core.StreamingOutput;
 import org.silnith.example.j2ee.web.model.Polygon;
 import org.silnith.example.j2ee.web.model.Tessellator;
 
+@ApplicationScoped
 @Path("tessellate")
 public class TessellateResource {
 
-	private final Tessellator tessellator = new Tessellator();
-
-//	public TessellateResource(final Tessellator tessellator) {
-//		super();
-//		this.tessellator = tessellator;
-//	}
-
-	@GET
-	@Produces({MediaType.TEXT_PLAIN})
-	public String getRoot() {
-		return "running";
+    @NotNull
+	private Tessellator tessellator;
+	
+	public TessellateResource() {
+	    super();
 	}
 
+	@Inject
+	public TessellateResource(final Tessellator tessellator) {
+		super();
+		this.tessellator = tessellator;
+	}
+	
 	@POST
 	public List<Polygon> tessellate(final List<Polygon> polygons) {
 		final List<Polygon> triangles = new ArrayList<>();

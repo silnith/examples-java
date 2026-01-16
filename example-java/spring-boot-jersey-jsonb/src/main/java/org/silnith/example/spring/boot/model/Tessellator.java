@@ -1,18 +1,19 @@
-package org.silnith.example.j2ee.web.model;
+package org.silnith.example.spring.boot.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import jakarta.enterprise.context.ApplicationScoped;
+import org.springframework.stereotype.Component;
+
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.executable.ExecutableType;
 import jakarta.validation.executable.ValidateOnExecution;
 
-@ApplicationScoped
+@Component
 @ValidateOnExecution(type = {ExecutableType.ALL, ExecutableType.CONSTRUCTORS, ExecutableType.GETTER_METHODS, ExecutableType.NON_GETTER_METHODS})
 public class Tessellator {
 

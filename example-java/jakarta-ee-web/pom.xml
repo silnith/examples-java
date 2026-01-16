@@ -17,7 +17,7 @@
         <maven.compiler.release>11</maven.compiler.release>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
-        <cargo.maven.containerId>wildfly29x</cargo.maven.containerId>
+        <cargo.servlet.port>8080</cargo.servlet.port>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -27,9 +27,16 @@
                 <version>10.0.0</version>
             </dependency>
             <dependency>
+				<groupId>org.glassfish.jersey</groupId>
+				<artifactId>jersey-bom</artifactId>
+				<version>3.1.11</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+            <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
-                <version>5.10.2</version>
+                <version>5.14.2</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -44,13 +51,16 @@
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
             <artifactId>jersey-client</artifactId>
-            <version>3.1.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.glassfish.jersey.media</groupId>
             <artifactId>jersey-media-json-binding</artifactId>
-            <version>3.1.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-multipart</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -62,11 +72,6 @@
     <build>
         <pluginManagement>
             <plugins>
-                <plugin>
-                    <groupId>org.codehaus.cargo</groupId>
-                    <artifactId>cargo-maven3-plugin</artifactId>
-                    <version>1.10.9</version>
-                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
@@ -88,6 +93,9 @@
                 <configuration>
                     <container>
                         <containerId>wildfly29x</containerId>
+                        <!--
+                        <containerId>glassfish7x</containerId>
+                        -->
                     </container>
                 </configuration>
                 <executions>
